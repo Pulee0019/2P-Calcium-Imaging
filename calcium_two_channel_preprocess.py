@@ -43,50 +43,89 @@ def run_suite2p_channel(data_path, channel_dir, functional_chan):
     ops = suite2p.default_ops()
     
     ops.update({
+        # 'file_type': 'tif',
         'data_path': [data_path],
-        
+
         'save_path0': channel_dir,
-        
+
+        ######## Main settings ########
+        # 'nplanes': 1,
         'nchannels': 2,
         'functional_chan': functional_chan,
-        
-        'file_type': 'tif',
-        
-        'fs': 15.136,
         'tau': 1.5,
+        'fs': 15.136,
+        # 'do_bidiphase': False,
+        # 'multiplane_parallel': False,
+        # 'ignore_flyback': -1,
         
-        'do_registration': True,
-        'two_step_registration': True,
-        'keep_movie_raw': True,
-        
-        'sparse_mode': True,
-        'spatial_scale': 2,  # 1: 400px, 2: 800px, 3: 1600px
-        'connected': True,
-        'nbinned': 5000,
-        'max_iterations': 200,
-        'threshold_scaling': 1.0,
-        'max_overlap': 0.75,
-        'high_pass': 100,
-        
-        'inner_neuropil_radius': 2,
-        'min_neuropil_pixels': 350,
-        'lam_percentile': 50.0,
-        
-        'denoise': True,
-        'signal_extraction': 'raw',
-        
-        'batch_size': 500,
-        
-        'preclassify': 0.25,
-        'sensor_tau': 2.0,
+        ######## Output settings ########
+        # 'preclassify': 0.25,
         'save_NWB': True,
         'save_mat': True,
-        
-        'nonrigid': True,
-        'block_size': [128, 128],
-        
+        # 'combined': True,
+        # 'reg_tif': False,
+        # 'reg_tif_chan2': False,
+        # 'aspect': 1.0,
+        # 'delete_bin': False,
+        # 'move_bin': False,
+
+        ######## Registration ########
+        # 'do_registration': True,
         'align_by_chan': 1,
-        'force_sktiff': False,
+        # 'nimg_init': 300,
+        # 'batch_size': 500,
+        # 'smooth_sigma': 1.15,
+        # 'smooth_sigma_time': 0,
+        # 'maxregshift': 0.1,
+        # 'th_badframes': 1.0,
+        # 'keep_movie_raw': False,
+        # 'two_step_registration': False,
+
+        ######## Nongrid ########
+        # 'nonrigid': True,
+        # 'block_size': [128, 128],
+        # 'snr_thresh': 1.2,
+        # 'maxregshiftNR': 5,
+
+        ######## 1P ########
+        # '1Preg': 0,
+        # 'spatial_hp_reg': 42,
+        # 'pre_smooth': False,
+        # 'spatial_taper': 40,
+        
+        ######## Functional detect ########
+        # 'roidetect': True,
+        # 'sparse_mode': True,
+        # 'denoise': True,
+        # 'spatial_scale': 2,
+        # 'connected': True,
+        # 'threshold_scaling': 1.0,
+        # 'max_overlap': 0.75,
+        # 'max_iterations': 200,
+        # 'high_pass': 100,
+        # 'spatial_hp_detect': 25,
+
+        ######## Anat detect ########
+        'anatomical_only': 3,
+        # 'diameter': 0,
+        # 'cellprob_threshold': 0.0,
+        # 'flow_threshold': 1.2,
+        # 'pretrained_model': cyto,
+        # 'spatial_hp_cp': 0,
+
+        ######## Extraction/Neuropil ########
+        # 'nbinned': 5000,
+        # 'inner_neuropil_radius': 2,
+        # 'min_neuropil_pixels': 350,
+        # 'lam_percentile': 50.0,
+
+        ######## Classify/Deconv ########
+        # 'soma_crop': True,
+        # 'spikedetect': True,
+        # 'win_baseline': 60.0,
+        # 'sig_baseline': 10.0,
+        # 'neucoeff': 0.7,
+
     })
     
     print(f"Running suite2p for channel {functional_chan}...")
