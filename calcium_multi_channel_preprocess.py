@@ -22,12 +22,11 @@ def convert_tiff_sequence(input_file, output_dir):
     
     file_name = input_file.split("/")[-1].split(".")[0] + "_processed.tif"
     output_file = os.path.join(output_dir, file_name)
-    if os.path.exists(output_file):
-        print(f"File {output_file} already existed")
-        exit()
-
-    tifffile.imwrite(output_file, new_sequence)
-    print(f"Process completed! result save as {output_file}.")
+    if not os.path.exists(output_file):
+        tifffile.imwrite(output_file, new_sequence)
+        print(f"Process completed! result save as {output_file}.")
+    else:
+        print(f"{output_file} already existed!")
 
 if __name__ == "__main__":
     input_file = filedialog.askopenfilename(
@@ -41,16 +40,23 @@ if __name__ == "__main__":
 
     base_dir = os.path.dirname(os.path.dirname(input_file))
     output_dir = os.path.join(base_dir, "output")
-    ch1_dir = os.path.join(output_dir, "ch1")
-    ch2_dir = os.path.join(output_dir, "ch2")
-
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
+    else:
+        print(f"{output_dir} already existed!")
 
+    convert_tiff_sequence(input_file, output_dir)
+    
+    ch1_dir = os.path.join(output_dir, "ch1")
+    ch2_dir = os.path.join(output_dir, "ch2")
     if not os.path.exists(ch1_dir):
         os.makedirs(ch1_dir)
+    else:
+        print(f"{ch1_dir} already existed!")
     
     if not os.path.exists(ch2_dir):
         os.makedirs(ch2_dir)
+    else:
+        print(f"{ch2_dir} already existed!")
 
-    convert_tiff_sequence(input_file, output_dir)
+    
