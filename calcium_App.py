@@ -36,6 +36,7 @@ class CalciumImagingAnalyzer:
         self.loaded = False
         self.selected_neuron_idx = -1
         self.neuron_queue = []
+        self.background_image = None
         
         self.channel_colors = {
             'ch1': 'green',
@@ -197,6 +198,47 @@ class CalciumImagingAnalyzer:
         except Exception as e:
             print(f"Error reading AST2 file: {str(e)}")
             return None
+    
+    def compute_mean_image(self, movie):
+        mean_img = movie.mean(axis=0).astype(np.float32)
+        p5, p95 = np.percentile(mean_img, [5, 95])
+        mean_img = (mean_img - p5) / (p95 - p5)
+        mean_img = np.clip(mean_img, 0, 1)
+        return mean_img
+
+    def load_background_image(self, channel_path):
+        try:
+            data_bin_path = os.path.join(channel_path, 'data.bin')
+            if not os.path.exists(data_bin_path):
+                print(f"data.bin not found at {data_bin_path}")
+                return False
+                
+            ops_path = os.path.join(channel_path, 'ops.npy')
+            if not os.path.exists(ops_path):
+                print(f"ops.npy not found at {ops_path}")
+                return False
+                
+            ops = np.load(ops_path, allow_pickle=True).item()
+            Ly, Lx = ops['Ly'], ops['Lx']
+            dtype = np.dtype(ops.get('data_type', 'uint16'))
+            
+            raw = np.fromfile(data_bin_path, dtype=dtype)
+            n_frames = raw.size // (Ly * Lx)
+            
+            if n_frames == 0:
+                print("No frames found in data.bin")
+                return False
+                
+            movie = raw.reshape((n_frames, Ly, Lx))
+
+            self.background_image = self.compute_mean_image(movie)
+
+            print(f"Background image loaded: {self.background_image.shape}")
+            return True
+            
+        except Exception as e:
+            print(f"Error loading background image: {str(e)}")
+            return False
         
     def load_from_directory(self, base_directory):
         try:
@@ -235,6 +277,8 @@ class CalciumImagingAnalyzer:
                     'spks': np.load(os.path.join(channel_path, "spks.npy")),
                     'iscell': np.load(os.path.join(channel_path, "iscell.npy"))
                 }
+                if channel_name == channel_names[0]:
+                    self.load_background_image(channel_path)
             
             first_channel = list(self.channels_data.values())[0]
             self.Ly = first_channel['ops']['Ly']
@@ -957,7 +1001,14 @@ class CalciumImagingAnalyzer:
         fig = Figure(figsize=(8, 8), dpi=100)
         ax = fig.add_subplot(111)
         
-        img = ax.imshow(self.combined_mask, cmap=self.cmap, 
+        if self.background_image is not None:
+            ax.imshow(self.background_image, cmap='gray', extent=[0, self.Lx, self.Ly, 0])
+            
+            img = ax.imshow(self.combined_mask, cmap=self.cmap, 
+                        vmin=0, vmax=len(self.combined_neurons), 
+                        interpolation='nearest', alpha=0.5)
+        else:
+            img = ax.imshow(self.combined_mask, cmap=self.cmap, 
                         vmin=0, vmax=len(self.combined_neurons), 
                         interpolation='nearest')
         
@@ -967,7 +1018,7 @@ class CalciumImagingAnalyzer:
             highlight_mask = np.zeros_like(self.combined_mask)
             highlight_mask[ypix, xpix] = 1
             ax.imshow(highlight_mask, cmap=ListedColormap(['none', 'cyan']), 
-                     alpha=0.7, interpolation='nearest')
+                    alpha=0.5, interpolation='nearest')
         
         for neuron_idx in queue_indices:
             if 0 <= neuron_idx < len(self.combined_neurons) and neuron_idx != highlight_idx:
