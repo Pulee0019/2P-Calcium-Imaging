@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Nov 11 15:55:31 2025
+Created on Tue Nov 11 19:23:26 2025
 
 @author: Pulee
 """
@@ -160,27 +160,18 @@ if __name__ == "__main__":
     else:
         print(f"{output_dir} already existed!")
 
-    processed_file = convert_tiff_sequence(input_file, output_dir)
+    destination = os.path.join(output_dir, os.path.basename(input_file))
+    shutil.move(input_file, destination)
 
     ch1_dir = os.path.join(output_dir, "ch1")
-    ch2_dir = os.path.join(output_dir, "ch2")
     if not os.path.exists(ch1_dir):
         os.makedirs(ch1_dir)
     else:
         print(f"{ch1_dir} already existed!")
     
-    if not os.path.exists(ch2_dir):
-        os.makedirs(ch2_dir)
-    else:
-        print(f"{ch2_dir} already existed!")
-    
     print("Starting suite2p analysis for channel 1...")
-    run_suite2p_channel(output_dir, ch1_dir, 1, 2)
-    
-    print("Starting suite2p analysis for channel 2...")
-    run_suite2p_channel(output_dir, ch2_dir, 2, 2)
+    run_suite2p_channel(output_dir, ch1_dir, 1, 1)
     
     print("All analyses completed!")
     print(f"Results saved in:")
     print(f"Channel 1: {ch1_dir}")
-    print(f"Channel 2: {ch2_dir}")
