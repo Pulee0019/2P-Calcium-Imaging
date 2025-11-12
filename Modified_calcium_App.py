@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 """
+Created on Tue Nov 4 20:18:50 2025
+
 Modified Calcium Imaging Analyzer with Menu Bar Interface
+
+@author: Pulee
 """
 
 import numpy as np
