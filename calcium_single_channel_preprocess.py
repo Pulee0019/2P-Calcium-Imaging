@@ -143,7 +143,10 @@ def run_suite2p_channel(data_path, channel_dir, functional_chan, nchannels):
     #             elif file.startswith('temp'):
     #                 os.remove(file_path)
 
-if __name__ == "__main__":
+def main():
+    root = tk.Tk()
+    root.withdraw()
+
     input_file = filedialog.askopenfilename(
         title="Please select TIFF file",
         filetypes=[("TIFF files", "*.tif;*.tiff"), ("All files", "*.*")]
@@ -175,3 +178,6 @@ if __name__ == "__main__":
     print("All analyses completed!")
     print(f"Results saved in:")
     print(f"Channel 1: {ch1_dir}")
+
+if __name__ == "__main__":
+    main()
